@@ -127,7 +127,7 @@ namespace pilight.ViewModel
 
         private void Connect()
         {
-            websocket = new WebSocket("ws://home.robertdeveen.com:5001/");
+            websocket = new WebSocket("ws://192.168.178.29:5001/");
 
             websocket.Opened += new EventHandler(websocket_Opened);
             websocket.Error += new EventHandler<ErrorEventArgs>(websocket_Error);
