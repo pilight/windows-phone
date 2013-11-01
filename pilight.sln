@@ -5,6 +5,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pilight-WP7", "pilight-WP7\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pilight-WP8", "pilight-WP8\pilight-WP8.csproj", "{39D08F72-364D-4C80-9EDE-A1A81FB4553E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{44D8FFD2-2A72-42F9-AC90-21B9A64C5D62}"
+	ProjectSection(SolutionItems) = preProject
+		content\screen.png = content\screen.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
