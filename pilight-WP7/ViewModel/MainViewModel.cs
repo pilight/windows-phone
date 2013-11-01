@@ -88,7 +88,10 @@ namespace pilight.ViewModel
                             {
                                 Key = (String)property.Name,
                                 Name = (String)property.Value["name"],
+                                Type = (DeviceType)Enum.Parse(typeof(DeviceType), (String)property.Value["type"], true),
                                 Id = ParseId(property.Value["id"]),
+                                Temperature = (property.Value["temperature"] != null) ? (double)property.Value["temperature"] / 1000 : 0,
+                                State = (property.Value["state"] != null) ? (string)property.Value["state"] == "on" : false,
                                 Protocol = ParseProtocol(property.Value["protocol"])
                             };
 

@@ -19,6 +19,7 @@
     shell:SystemTray.IsVisible="True"
     DataContext="{Binding Main, Source={StaticResource Locator}}">
 
+    
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
 
@@ -38,7 +39,7 @@
                             <DataTemplate>
                                 <StackPanel Width="432">
 
-                                    <Grid Margin="10,0,10,20">
+                                    <Grid Margin="10,0,10,20" Visibility="{Binding Path=Type, Converter={StaticResource visibilityConverter}, ConverterParameter=WEATHER}">
 
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition />
@@ -56,7 +57,11 @@
                                                                     Grid.Column="1" HorizontalAlignment="Right"/>
                                     </Grid>
 
-                                    <toolkit:ToggleSwitch Header="{Binding}" IsChecked="{Binding State, Mode=TwoWay}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked">
+                                    <toolkit:ToggleSwitch Header="{Binding}" 
+                                                          IsChecked="{Binding State, Mode=TwoWay}" 
+                                                          Checked="ToggleSwitch_Checked" 
+                                                          Unchecked="ToggleSwitch_Unchecked"
+                                                          Visibility="{Binding Path=Type, Converter={StaticResource visibilityConverter}, ConverterParameter=SWITCH}">
                                         <toolkit:ToggleSwitch.HeaderTemplate>
                                             <DataTemplate>
                                                 <ContentControl FontSize="{StaticResource PhoneFontSizeLarge}" 

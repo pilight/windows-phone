@@ -9,8 +9,7 @@ namespace pilight.Model
     public class Device : ViewModelBase
     {
         public String Name { get; set; }
-        //public int Order { get; set; }
-        //public Dictionary<String, List<String>> settings = new Dictionary<String, List<String>>();
+        public DeviceType Type { get; set; }
 
         private double _temperature;
         private bool _state;
@@ -80,5 +79,14 @@ namespace pilight.Model
 
         }
         public int Dimlevel { get; set; }
+    }
+
+    public enum DeviceType
+    {  
+        RAW = 0,
+        SWITCH = 1,
+        DIMMER = 2,
+        WEATHER = 3,
+        RELAY = 4
     }
 }
