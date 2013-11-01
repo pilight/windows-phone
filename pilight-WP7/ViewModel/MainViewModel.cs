@@ -15,6 +15,7 @@ using WebSocket4Net;
 using GalaSoft.MvvmLight.Threading;
 using System.Windows.Threading;
 using System.Windows;
+using Newtonsoft.Json.Converters;
 
 namespace pilight.ViewModel
 {
@@ -34,7 +35,7 @@ namespace pilight.ViewModel
     {
         private ObservableCollection<Location> _locations = new ObservableCollection<Location>();
 
-        private WebSocket websocket;
+        public WebSocket websocket;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -53,10 +54,8 @@ namespace pilight.ViewModel
             private set { }
         }
 
-
         private void ParseResult(string p)
         {
-            var result = JsonConvert.DeserializeObject(p);
             var json = JObject.Parse(p);
 
             if (json["config"] != null)
@@ -65,34 +64,7 @@ namespace pilight.ViewModel
             }
             else
             {
-
-                var x = JsonConvert.DeserializeObject<Update>(p);
-
-
-                /// OK!
-                var resultTemp = (float)json["values"]["temperature"] / 1000;
-
-                foreach (JProperty device in json["devices"])
-                {
-                    var deviceName = device.Name;
-                    var deviceKey = (String)(device.Value.First);
-
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                       {
-                           var loc = _locations.First(l => l.Name == deviceName);
-
-                           var dev = loc.Devices.FirstOrDefault(d => d.Key == deviceKey);
-                           if (dev == null)
-                           {
-                               dev = new Device() { Key = deviceKey, Temperature = resultTemp };
-                               loc.Devices.Add(dev);
-                           }
-                           else
-                           {
-                               dev.Temperature = resultTemp;
-                           }
-                       });
-                }
+                updateGui(json["values"], json["devices"]);
             }
 
         }
@@ -103,20 +75,29 @@ namespace pilight.ViewModel
             {
                 var loc = new Location() { Name = location.Name, Devices = new ObservableCollection<Device>() };
 
-                foreach (var x in location.First().Last())
+                foreach (JProperty property in location.First().Children())
                 {
-                    var device = new Device()
+                    switch (property.Name)
                     {
-                        Key = "temperature",
-                        Name = (String)x["name"],
-                        Id = (String)((JValue)(((JProperty)((x["id"].First).First)).Value)).Value,
-                        Protocol = (String)((JValue)((x["protocol"]).First)).Value
-                    };
+                        case "name":
+                            break;
+                        case "order":
+                            break;
+                        default:
+                            var device = new Device()
+                            {
+                                Key = (String)property.Name,
+                                Name = (String)property.Value["name"],
+                                Id = ParseId(property.Value["id"]),
+                                Protocol = ParseProtocol(property.Value["protocol"])
+                            };
 
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                    {
-                        loc.Devices.Add(device);
-                    });
+                            Deployment.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                loc.Devices.Add(device);
+                            });
+                            break;
+                    }
                 }
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
@@ -125,9 +106,71 @@ namespace pilight.ViewModel
             }
         }
 
+        private void updateGui(JToken jValues, JToken jDevices)
+        {
+            foreach (JProperty value in jValues)
+            {
+                double resultTemp = 0;
+                bool resultState = false;
+
+                switch (value.Name)
+                {
+                    case "temperature":
+                        resultTemp = (double)jValues["temperature"] / 1000;
+                        break;
+
+                    case "state":
+                        resultState = ((string)jValues["state"] == "on");
+                        break;
+
+                    case "humidity":
+                    case "battery":
+                        break;
+                }
+
+
+                foreach (JProperty device in jDevices)
+                {
+                    var deviceName = device.Name;
+                    var deviceKey = (String)(device.Value.First);
+
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        var loc = _locations.First(l => l.Name == deviceName);
+
+                        var devicesToUpdate = from d in loc.Devices
+                                              where d.Key == deviceKey
+                                              select d;
+
+                        foreach (var dev in devicesToUpdate)
+                        {
+                            dev.Temperature = resultTemp;
+                            dev.State = resultState;
+                        }
+                    });
+                }
+            }
+        }
+
+
+        private Dictionary<String, String> ParseId(JToken ids)
+        {
+            Dictionary<String, String> returnValues = new Dictionary<String, String>();
+            foreach (JProperty id in ids.Values())
+            {
+                returnValues.Add(id.Name, (String)id.Value);
+            }
+            return returnValues;
+        }
+
+        private List<String> ParseProtocol(JToken protocols)
+        {
+            return protocols.Values<String>().ToList();
+        }
+
         private void Connect()
         {
-            websocket = new WebSocket("ws://192.168.178.29:5001/");
+            websocket = new WebSocket("ws://home.robertdeveen.com:5001/");
 
             websocket.Opened += new EventHandler(websocket_Opened);
             websocket.Error += new EventHandler<ErrorEventArgs>(websocket_Error);
@@ -150,12 +193,18 @@ namespace pilight.ViewModel
 
         private void websocket_Closed(object sender, EventArgs e)
         {
-            // Nothing to do here.
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                MessageBox.Show("Connection closed");
+            });
         }
 
         private void websocket_Error(object sender, ErrorEventArgs e)
         {
-            // Nothing to do here.
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                MessageBox.Show(e.Exception.Message, "Error", MessageBoxButton.OK);
+            });
         }
     }
 }

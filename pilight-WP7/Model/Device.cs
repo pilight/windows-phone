@@ -6,34 +6,53 @@ using System.Text;
 
 namespace pilight.Model
 {
-    public class Device: ViewModelBase
+    public class Device : ViewModelBase
     {
+        public String Name { get; set; }
+        //public int Order { get; set; }
+        //public Dictionary<String, List<String>> settings = new Dictionary<String, List<String>>();
+
         private double _temperature;
+        private bool _state;
 
         public String Key
         {
             get;
             set;
         }
-        public String Name
+
+        public Dictionary<String, String> Id
         {
             get;
             set;
         }
-        public String Id
+        public List<String> Protocol
         {
             get;
             set;
         }
-        public String Protocol
+        public bool State
         {
-            get;
-            set;
-        }
-        public Boolean State
-        {
-            get;
-            set;
+            get
+            {
+                return _state;
+            }
+
+            set
+            {
+                if (_state == value)
+                {
+                    return;
+                }
+
+                var oldValue = _state;
+                _state = value;
+
+                // Update bindings and broadcast change using GalaSoft.MvvmLight.Messenging
+                GalaSoft.MvvmLight.Threading.DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                    RaisePropertyChanged("State", oldValue, value, true)
+                );
+            }
         }
 
         public double Temperature
@@ -55,14 +74,11 @@ namespace pilight.Model
 
                 // Update bindings and broadcast change using GalaSoft.MvvmLight.Messenging
                 GalaSoft.MvvmLight.Threading.DispatcherHelper.CheckBeginInvokeOnUI(() =>
-                    RaisePropertyChanged("Temperature", oldValue, value, true));
+                    RaisePropertyChanged("Temperature", oldValue, value, true)
+                );
             }
 
         }
-        public int Dimlevel
-        {
-            get;
-            set;
-        }        
+        public int Dimlevel { get; set; }
     }
 }
