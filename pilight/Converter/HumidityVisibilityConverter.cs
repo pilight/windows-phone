@@ -6,13 +6,13 @@ using System.Text;
 using System.Windows;
 using System.Windows.Data;
 
-namespace pilight
+namespace pilight.Converter
 {
-    public class VisibilityConverter : IValueConverter
+    public class HumidityVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return ((DeviceType)value == (DeviceType)Enum.Parse(typeof(DeviceType), (String)parameter, true)) ? Visibility.Visible : Visibility.Collapsed;
+            return ((double)value > 0) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

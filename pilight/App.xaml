@@ -1,4 +1,4 @@
-﻿<Application x:Class="pilight_WP7.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+﻿<Application x:Class="pilight.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone" 
              xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone" 
@@ -7,7 +7,8 @@
     <!--Application Resources-->
     <Application.Resources>
         <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:pilight.ViewModel" />
-        <base:VisibilityConverter x:Key="visibilityConverter" xmlns:base="clr-namespace:pilight" />
+        <base:TypeVisibilityConverter x:Key="typeVisibilityConverter" xmlns:base="clr-namespace:pilight.Converter" />
+        <base:HumidityVisibilityConverter x:Key="HumidityVisibilityConverter" xmlns:base="clr-namespace:pilight.Converter" />
     </Application.Resources>
 
     <Application.ApplicationLifetimeObjects>

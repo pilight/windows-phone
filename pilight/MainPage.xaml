@@ -10,7 +10,7 @@
     xmlns:vm="clr-namespace:pilight.ViewModel;assembly=pilight"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     xmlns:Model="clr-namespace:pilight.Model;assembly=pilight" 
-    x:Class="pilight_WP7.MainPage"
+    x:Class="pilight.MainPage"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -19,7 +19,6 @@
     shell:SystemTray.IsVisible="True"
     DataContext="{Binding Main, Source={StaticResource Locator}}">
 
-    
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
 
@@ -39,7 +38,7 @@
                             <DataTemplate>
                                 <StackPanel Width="432">
 
-                                    <Grid Margin="10,0,10,20" Visibility="{Binding Path=Type, Converter={StaticResource visibilityConverter}, ConverterParameter=WEATHER}">
+                                    <Grid Margin="10,0,10,20" Visibility="{Binding Path=Type, Converter={StaticResource typeVisibilityConverter}, ConverterParameter=WEATHER}">
 
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition />
@@ -51,17 +50,25 @@
                                                                     Text="{Binding Name}"
                                                    Grid.Column="0"/>
 
-                                        <TextBlock FontSize="{StaticResource PhoneFontSizeLarge}" 
+                                        <StackPanel Grid.Column="1" Orientation="Vertical">
+                                            <TextBlock FontSize="{StaticResource PhoneFontSizeLarge}" 
                                                                     Foreground="{StaticResource PhoneForegroundBrush}" 
                                                                     Text="{Binding Temperature, StringFormat='{}{0:F}°C'}"
-                                                                    Grid.Column="1" HorizontalAlignment="Right"/>
+                                                                    HorizontalAlignment="Right"/>
+
+                                            <TextBlock FontSize="{StaticResource PhoneFontSizeLarge}" 
+                                                                    Foreground="{StaticResource PhoneForegroundBrush}" 
+                                                                    Text="{Binding Humidity, StringFormat='{}{0}%'}"
+                                                                    Visibility="{Binding Path=Humidity, Converter={StaticResource HumidityVisibilityConverter}}"                                                     
+                                                                    HorizontalAlignment="Right"/>
+                                        </StackPanel>
                                     </Grid>
 
                                     <toolkit:ToggleSwitch Header="{Binding}" 
                                                           IsChecked="{Binding State, Mode=TwoWay}" 
                                                           Checked="ToggleSwitch_Checked" 
                                                           Unchecked="ToggleSwitch_Unchecked"
-                                                          Visibility="{Binding Path=Type, Converter={StaticResource visibilityConverter}, ConverterParameter=SWITCH}">
+                                                          Visibility="{Binding Path=Type, Converter={StaticResource typeVisibilityConverter}, ConverterParameter=SWITCH}">
                                         <toolkit:ToggleSwitch.HeaderTemplate>
                                             <DataTemplate>
                                                 <ContentControl FontSize="{StaticResource PhoneFontSizeLarge}" 
@@ -71,6 +78,20 @@
                                         </toolkit:ToggleSwitch.HeaderTemplate>
                                     </toolkit:ToggleSwitch>
 
+                                    <toolkit:ToggleSwitch Header="{Binding}" 
+                                                          IsChecked="{Binding State, Mode=TwoWay}" 
+                                                          Checked="ToggleSwitch_Checked" 
+                                                          Unchecked="ToggleSwitch_Unchecked"
+                                                          Visibility="{Binding Path=Type, Converter={StaticResource typeVisibilityConverter}, ConverterParameter=RELAY}">
+                                        <toolkit:ToggleSwitch.HeaderTemplate>
+                                            <DataTemplate>
+                                                <ContentControl FontSize="{StaticResource PhoneFontSizeLarge}" 
+                                                                Foreground="{StaticResource PhoneForegroundBrush}" 
+                                                                Content="{Binding Name}"/>
+                                            </DataTemplate>
+                                        </toolkit:ToggleSwitch.HeaderTemplate>
+                                    </toolkit:ToggleSwitch>
+                                    
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>

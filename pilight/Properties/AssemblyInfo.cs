@@ -9,10 +9,10 @@ using System.Resources;
 [assembly: AssemblyTitle("pilight")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("R. de Veen")]
 [assembly: AssemblyProduct("pilight")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © 2014 R. de Veen")]
+[assembly: AssemblyTrademark("Copyright © 2014 pilight")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

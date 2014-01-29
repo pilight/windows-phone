@@ -16,6 +16,7 @@ using GalaSoft.MvvmLight.Threading;
 using System.Windows.Threading;
 using System.Windows;
 using Newtonsoft.Json.Converters;
+using Microsoft.Phone.Shell;
 
 namespace pilight.ViewModel
 {
@@ -42,7 +43,14 @@ namespace pilight.ViewModel
         /// </summary>
         public MainViewModel()
         {
+            GlobalLoading.Instance.IsLoading = true;
             Connect();
+        }
+
+        public bool IsLoaded
+        {
+            get;
+            set;
         }
 
         public ObservableCollection<Location> Locations
@@ -64,9 +72,13 @@ namespace pilight.ViewModel
             }
             else
             {
-                updateGui(json["values"], json["devices"]);
+                updateGui(json["values"], json["devices"], json["settings"]);
             }
 
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                GlobalLoading.Instance.IsLoading = false;
+            });
         }
 
         private void createGui(JToken config)
@@ -90,9 +102,11 @@ namespace pilight.ViewModel
                                 Name = (String)property.Value["name"],
                                 Type = (DeviceType)Enum.Parse(typeof(DeviceType), (String)property.Value["type"], true),
                                 Id = ParseId(property.Value["id"]),
-                                Temperature = (property.Value["temperature"] != null) ? (double)property.Value["temperature"] / 1000 : 0,
+                                Temperature = (property.Value["temperature"] != null) ? (double)property.Value["temperature"] : 0,
+                                Humidity = (property.Value["humidity"] != null) ? (double)property.Value["humidity"] : 0,
                                 State = (property.Value["state"] != null) ? (string)property.Value["state"] == "on" : false,
-                                Protocol = ParseProtocol(property.Value["protocol"])
+                                Protocol = ParseProtocol(property.Value["protocol"]),
+                                settings = ParseSettings(property.Value["settings"])
                             };
 
                             Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -109,7 +123,11 @@ namespace pilight.ViewModel
             }
         }
 
-        private void updateGui(JToken jValues, JToken jDevices)
+        private Settings ParseSettings(JToken jToken)
+        {
+            return jToken.ToObject<Settings>();
+        }
+        private void updateGui(JToken jValues, JToken jDevices, JToken jSettings)
         {
             foreach (JProperty value in jValues)
             {
@@ -119,7 +137,7 @@ namespace pilight.ViewModel
                 switch (value.Name)
                 {
                     case "temperature":
-                        resultTemp = (double)jValues["temperature"] / 1000;
+                        resultTemp = (double)jValues["temperature"];
                         break;
 
                     case "state":
@@ -173,20 +191,30 @@ namespace pilight.ViewModel
 
         private void Connect()
         {
-            websocket = new WebSocket("ws://home.robertdeveen.com:5001/");
+            //websocket = new WebSocket("ws://192.168.178.29:5001/");
+
+            List<KeyValuePair<string, string>> Cookies = new List<KeyValuePair<string, string>>();
+
+            //websocket = new WebSocket("ws://192.168.178.29:5001/")
+            websocket = new WebSocket("ws://home.robertdeveen.com:5001/", "data", Cookies);
 
             websocket.Opened += new EventHandler(websocket_Opened);
             websocket.Error += new EventHandler<ErrorEventArgs>(websocket_Error);
             websocket.Closed += new EventHandler(websocket_Closed);
-            websocket.MessageReceived += websocket_MessageReceived;
+            websocket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(websocket_MessageReceived);
+            websocket.DataReceived += websocket_DataReceived;
 
             websocket.Open();
         }
 
+        void websocket_DataReceived(object sender, DataReceivedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         private void websocket_Opened(object sender, EventArgs e)
         {
-            // websocket.Send("{\"message\": \"client receiver\"}");
-            websocket.Send("{\"message\": \"request config\"}");
+            websocket.Send("{\"message\":\"request config\"}");
         }
 
         private void websocket_MessageReceived(object sender, MessageReceivedEventArgs e)
@@ -198,7 +226,16 @@ namespace pilight.ViewModel
         {
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
-                MessageBox.Show("Connection closed");
+                MessageBoxResult result = MessageBox.Show("Try to reconnect?", "Connection closed", MessageBoxButton.OKCancel);
+
+                if (result == MessageBoxResult.OK)
+                {
+                    Connect();
+                }
+                else
+                {
+                    GlobalLoading.Instance.IsLoading = false;
+                }
             });
         }
 
@@ -208,6 +245,12 @@ namespace pilight.ViewModel
             {
                 MessageBox.Show(e.Exception.Message, "Error", MessageBoxButton.OK);
             });
+        }
+
+        internal void SetState(string location, string device, string state)
+        {
+            var s = "{\"message\": \"send\",\"code\": {\"location\": \"" + location + "\",\"device\": \"" + device + "\",\"state\": \"" + state + "\"}}";
+            this.websocket.Send(s);
         }
     }
 }
