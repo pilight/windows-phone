@@ -9,6 +9,7 @@
         <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:pilight.ViewModel" />
         <base:TypeVisibilityConverter x:Key="typeVisibilityConverter" xmlns:base="clr-namespace:pilight.Converter" />
         <base:HumidityVisibilityConverter x:Key="HumidityVisibilityConverter" xmlns:base="clr-namespace:pilight.Converter" />
+        <base:AppSettings x:Key="appSettings" xmlns:base="clr-namespace:pilight" />
     </Application.Resources>
 
     <Application.ApplicationLifetimeObjects>

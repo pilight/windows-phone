@@ -7,16 +7,12 @@ using GalaSoft.MvvmLight;
 using pilight.Model;
 using System.Collections.ObjectModel;
 
-using Newtonsoft.Json;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using SuperSocket.ClientEngine;
 using WebSocket4Net;
-using GalaSoft.MvvmLight.Threading;
-using System.Windows.Threading;
 using System.Windows;
-using Newtonsoft.Json.Converters;
-using Microsoft.Phone.Shell;
+using System.Net;
+using System.Windows.Navigation;
 
 namespace pilight.ViewModel
 {
@@ -44,7 +40,15 @@ namespace pilight.ViewModel
         public MainViewModel()
         {
             GlobalLoading.Instance.IsLoading = true;
-            Connect();
+
+            if (String.IsNullOrEmpty(new AppSettings().AddressSetting) || String.IsNullOrEmpty(new AppSettings().PortSetting))
+            {
+                MessageBox.Show("Please set settings.", "Connection error", MessageBoxButton.OK);
+            }
+            else
+            {
+                Connect();
+            }
         }
 
         public bool IsLoaded
@@ -127,8 +131,12 @@ namespace pilight.ViewModel
         {
             return jToken.ToObject<Settings>();
         }
+
         private void updateGui(JToken jValues, JToken jDevices, JToken jSettings)
         {
+            if (_locations.Count == 0)
+                return;
+
             foreach (JProperty value in jValues)
             {
                 double resultTemp = 0;
@@ -148,7 +156,6 @@ namespace pilight.ViewModel
                     case "battery":
                         break;
                 }
-
 
                 foreach (JProperty device in jDevices)
                 {
@@ -173,7 +180,6 @@ namespace pilight.ViewModel
             }
         }
 
-
         private Dictionary<String, String> ParseId(JToken ids)
         {
             Dictionary<String, String> returnValues = new Dictionary<String, String>();
@@ -191,25 +197,18 @@ namespace pilight.ViewModel
 
         private void Connect()
         {
-            //websocket = new WebSocket("ws://192.168.178.29:5001/");
 
             List<KeyValuePair<string, string>> Cookies = new List<KeyValuePair<string, string>>();
 
-            //websocket = new WebSocket("ws://192.168.178.29:5001/")
-            websocket = new WebSocket("ws://home.robertdeveen.com:5001/", "data", Cookies);
+            string uri = String.Format("ws://{0}:{1}/", new AppSettings().AddressSetting, new AppSettings().PortSetting);
+            websocket = new WebSocket(uri);
 
-            websocket.Opened += new EventHandler(websocket_Opened);
+            websocket.Opened += websocket_Opened;
             websocket.Error += new EventHandler<ErrorEventArgs>(websocket_Error);
             websocket.Closed += new EventHandler(websocket_Closed);
             websocket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(websocket_MessageReceived);
-            websocket.DataReceived += websocket_DataReceived;
 
             websocket.Open();
-        }
-
-        void websocket_DataReceived(object sender, DataReceivedEventArgs e)
-        {
-            throw new NotImplementedException();
         }
 
         private void websocket_Opened(object sender, EventArgs e)
