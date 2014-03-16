@@ -110,7 +110,7 @@ namespace pilight.ViewModel
                                 Humidity = (property.Value["humidity"] != null) ? (double)property.Value["humidity"] : 0,
                                 State = (property.Value["state"] != null) ? (string)property.Value["state"] == "on" : false,
                                 Protocol = ParseProtocol(property.Value["protocol"]),
-                                settings = ParseSettings(property.Value["settings"])
+                                devicedecimals = (property.Value["device-decimals"] != null) ? (int)property.Value["device-decimals"] : 0
                             };
 
                             Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -126,12 +126,6 @@ namespace pilight.ViewModel
                 });
             }
         }
-
-        private Settings ParseSettings(JToken jToken)
-        {
-            return jToken.ToObject<Settings>();
-        }
-
         private void updateGui(JToken jValues, JToken jDevices, JToken jSettings)
         {
             if (_locations.Count == 0)

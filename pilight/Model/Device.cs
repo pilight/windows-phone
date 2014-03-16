@@ -60,11 +60,11 @@ namespace pilight.Model
             get
             {
                 // TODO: Make this better!
-                if (this.settings.decimals == 1)
+                if (this.devicedecimals == 1)
                     return _temperature / 10;
-                else if (this.settings.decimals == 2)
+                else if (this.devicedecimals == 2)
                     return _temperature / 100;
-                else if (this.settings.decimals == 3)
+                else if (this.devicedecimals == 3)
                     return _temperature / 1000;
                 else
                     return _temperature;
@@ -89,13 +89,14 @@ namespace pilight.Model
         }
         public double Humidity
         {
-           get{
-               // TODO: Make this better!
-                if (this.settings.decimals == 1)
+            get
+            {
+                // TODO: Make this better!
+                if (this.devicedecimals == 1)
                     return _humidity / 10;
-                else if (this.settings.decimals == 2)
+                else if (this.devicedecimals == 2)
                     return _humidity / 100;
-                else if (this.settings.decimals == 3)
+                else if (this.devicedecimals == 3)
                     return _humidity / 1000;
                 else
                     return _humidity;
@@ -119,11 +120,11 @@ namespace pilight.Model
         }
         public int Dimlevel { get; set; }
 
-        public Settings settings { get; set; }
+        public int devicedecimals { get; set; }
     }
 
     public enum DeviceType
-    {  
+    {
         RAW = 0,
         SWITCH = 1,
         DIMMER = 2,
