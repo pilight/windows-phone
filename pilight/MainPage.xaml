@@ -66,7 +66,7 @@
                                                           IsChecked="{Binding State, Mode=TwoWay}" 
                                                           Checked="ToggleSwitch_Checked" 
                                                           Unchecked="ToggleSwitch_Unchecked"
-                                                          Visibility="{Binding Path=Type, Converter={StaticResource typeVisibilityConverter}, ConverterParameter=SWITCH}">
+                                                          Visibility="{Binding Path=Type, Converter={StaticResource typeVisibilityConverter}, ConverterParameter=SWITCH}" Click="ToggleSwitch_Click">
                                         <toolkit:ToggleSwitch.HeaderTemplate>
                                             <DataTemplate>
                                                 <ContentControl FontSize="{StaticResource PhoneFontSizeLarge}" 

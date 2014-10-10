@@ -1,18 +1,13 @@
-
+using GalaSoft.MvvmLight;
+using Newtonsoft.Json.Linq;
+using pilight.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-
-using GalaSoft.MvvmLight;
-using pilight.Model;
 using System.Collections.ObjectModel;
-
-using Newtonsoft.Json.Linq;
-using SuperSocket.ClientEngine;
-using WebSocket4Net;
 using System.Windows;
-using System.Net;
-using System.Windows.Navigation;
+using WebSocket4Net;
+using System.Linq;
+using SuperSocket.ClientEngine;
 
 namespace pilight.ViewModel
 {
@@ -191,7 +186,6 @@ namespace pilight.ViewModel
 
         private void Connect()
         {
-
             List<KeyValuePair<string, string>> Cookies = new List<KeyValuePair<string, string>>();
 
             string uri = String.Format("ws://{0}:{1}/", new AppSettings().AddressSetting, new AppSettings().PortSetting);

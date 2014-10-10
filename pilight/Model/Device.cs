@@ -121,6 +121,9 @@ namespace pilight.Model
         public int Dimlevel { get; set; }
 
         public int devicedecimals { get; set; }
+
+        public double SunRise { get; set; }
+        public double SunSet { get; set; }
     }
 
     public enum DeviceType
